@@ -4,7 +4,138 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Event RSVP</title>
-		<link rel="stylesheet" href="styles.css">
+		<style>
+/* inlined styles.css */
+:root{
+	--bg:#f7f8fb;
+	--card-bg:#ffffff;
+	--text:#0f1724;
+	--muted:#55606a;
+	--primary:#0b76ef;
+	--primary-contrast:#ffffff;
+	--secondary:#6b7280;
+	--danger:#e11d48;
+	--radius:12px;
+	--container-width:1100px;
+	--shadow:0 6px 18px rgba(15,23,36,0.08);
+	--gap:1rem;
+	--space-sm:0.5rem;
+	--space-md:1rem;
+	--space-lg:1.5rem;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+	margin:0;
+	font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	background:var(--bg);
+	color:var(--text);
+	line-height:1.4;
+	-webkit-font-smoothing:antialiased;
+}
+
+.container{
+	width:100%;
+	max-width:var(--container-width);
+	margin:0 auto;
+	padding:1rem;
+}
+
+.site-header{
+	background:linear-gradient(90deg,#ffffff 0%, #f1f5f9 100%);
+	border-bottom:1px solid rgba(15,23,36,0.04);
+}
+.site-header .container{display:flex;flex-direction:column;gap:0.25rem;padding:1.25rem}
+.event-meta{color:var(--muted);margin:0}
+
+main.container{display:grid;grid-template-columns:1fr;gap:var(--gap);padding-top:1.25rem;padding-bottom:2rem}
+
+/* Card UI for sections */
+section{
+	background:var(--card-bg);
+	border-radius:var(--radius);
+	box-shadow:var(--shadow);
+	padding:1rem;
+	border:1px solid rgba(15,23,36,0.03);
+}
+
+section h2{margin-top:0;margin-bottom:0.5rem;font-size:1.125rem}
+
+/* Forms */
+.form-row{display:flex;flex-direction:column;margin-bottom:0.75rem}
+label{font-weight:600;color:var(--text);margin-bottom:0.375rem}
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select, textarea{
+	padding:0.6rem 0.75rem;
+	border-radius:8px;
+	border:1px solid rgba(15,23,36,0.09);
+	background:linear-gradient(180deg,#fff,#fbfdff);
+	color:var(--text);
+	font-size:0.95rem;
+}
+input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 4px rgba(11,118,239,0.12)}
+
+fieldset{border:none;padding:0;margin:0}
+legend{font-weight:600;margin-bottom:0.5rem}
+
+.form-actions{margin-top:0.5rem}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.55rem 0.9rem;border-radius:10px;border:1px solid transparent;font-weight:600;cursor:pointer;font-size:0.95rem}
+.btn:focus{outline:none;box-shadow:0 0 0 4px rgba(11,118,239,0.12)}
+.btn--primary{background:var(--primary);color:var(--primary-contrast)}
+.btn--secondary{background:transparent;color:var(--secondary);border-color:rgba(15,23,36,0.06)}
+.btn--danger{background:var(--danger);color:#fff}
+
+/* Use semantic button types in markup; provide utility classes matching IDs */
+button#submit-rsvp{all:unset;cursor:pointer}
+button#submit-rsvp.btn--primary{display:inline-block}
+
+.form-actions button{border-radius:8px}
+
+/* List controls */
+.list-controls{display:flex;gap:0.5rem;justify-content:flex-end;margin-bottom:0.75rem}
+.list-controls button{padding:0.5rem 0.75rem;border-radius:8px}
+
+.table-wrap{overflow:auto;border-radius:8px}
+.attendees-table{width:100%;border-collapse:collapse;min-width:560px}
+.attendees-table th,.attendees-table td{padding:0.75rem 0.5rem;text-align:left;border-bottom:1px solid rgba(15,23,36,0.04)}
+.attendees-table thead th{background:linear-gradient(180deg, #fbfdff, #fff);font-weight:700;color:var(--muted)}
+.attendees-table tbody tr:nth-child(even){background:rgba(11,118,239,0.02)}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Footer */
+.site-footer{padding:1rem 0;color:var(--muted);font-size:0.9rem}
+
+/* Responsive layout for larger screens */
+@media (min-width:800px){
+	main.container{grid-template-columns:1fr 420px;align-items:start}
+	/* Make primary content appear in left column and RSVP + attendees in right column */
+	#rsvp, #attendees{position:relative}
+}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Accessibility helpers */
+a{color:var(--primary)}
+a:focus{outline:2px dashed var(--primary);outline-offset:3px}
+
+/* Provide consistent button styles for IDs used in HTML */
+#export-csv{all:unset;cursor:pointer}
+#export-csv.btn{display:inline-block}
+#clear-all{all:unset;cursor:pointer}
+
+/* Small tweaks for inputs on very small screens */
+@media (max-width:420px){
+	.container{padding:0.75rem}
+	.site-header .container{padding:0.9rem}
+}
+
+</style>
 	</head>
 	<body>
 		<header class="site-header">
@@ -103,6 +234,232 @@
 			</div>
 		</footer>
 
-		<script src="app.js" defer></script>
+		<script>
+/* inlined app.js (DOMContentLoaded handler converted to immediate run since script is at end of body) */
+(function () {
+	const STORAGE_KEY = 'event_rsvp_list_v1';
+
+	// Elements
+	const form = document.getElementById('rsvp-form');
+	const nameInput = document.getElementById('name');
+	const emailInput = document.getElementById('email');
+	const guestsInput = document.getElementById('guests');
+	const statusEl = document.getElementById('form-status');
+	const attendeesBody = document.getElementById('attendees-body');
+	const exportBtn = document.getElementById('export-csv');
+	const clearBtn = document.getElementById('clear-all');
+
+	function readStorage() {
+		try {
+			return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+		} catch (e) {
+			console.error('Failed to read storage', e);
+			return [];
+		}
+	}
+
+	function writeStorage(list) {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+	}
+
+	function showMessage(message, type = 'success') {
+		statusEl.textContent = message;
+		statusEl.className = type === 'error' ? 'msg msg--error' : 'msg msg--success';
+		window.clearTimeout(showMessage._t);
+		showMessage._t = setTimeout(function () {
+			statusEl.textContent = '';
+			statusEl.className = '';
+		}, 4000);
+	}
+
+	function validateEmail(email) {
+		var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		return re.test(email);
+	}
+
+	function validateGuests(value) {
+		var n = parseInt(value, 10);
+		return Number.isInteger(n) && n >= 1 && n <= 10;
+	}
+
+	function renderList() {
+		var list = readStorage();
+		attendeesBody.innerHTML = '';
+
+		if (list.length === 0) {
+			var tr = document.createElement('tr');
+			var td = document.createElement('td');
+			td.colSpan = 4;
+			td.textContent = 'No RSVPs yet.';
+			td.style.color = '#6b7280';
+			tr.appendChild(td);
+			attendeesBody.appendChild(tr);
+			return;
+		}
+
+		list.forEach(function (item) {
+			var tr = document.createElement('tr');
+
+			var tdName = document.createElement('td');
+			tdName.textContent = item.name;
+
+			var tdEmail = document.createElement('td');
+			tdEmail.textContent = item.email;
+
+			var tdGuests = document.createElement('td');
+			tdGuests.textContent = item.guests;
+
+			var tdTime = document.createElement('td');
+			tdTime.textContent = formatTime(item.time);
+
+			var tdActions = document.createElement('td');
+			tdActions.style.whiteSpace = 'nowrap';
+
+			var del = document.createElement('button');
+			del.type = 'button';
+			del.textContent = 'Delete';
+			del.className = 'btn btn--danger';
+			del.setAttribute('aria-label', 'Delete RSVP for ' + item.name);
+			del.dataset.id = item.id;
+
+			tdActions.appendChild(del);
+
+			tr.appendChild(tdName);
+			tr.appendChild(tdEmail);
+			tr.appendChild(tdGuests);
+			tr.appendChild(tdTime);
+			tr.appendChild(tdActions);
+
+			attendeesBody.appendChild(tr);
+		});
+	}
+
+	function formatTime(iso) {
+		try {
+			var d = new Date(iso);
+			return d.toLocaleString();
+		} catch (e) {
+			return iso;
+		}
+	}
+
+	function addRsvp(_ref) {
+		var name = _ref.name,
+			email = _ref.email,
+			guests = _ref.guests;
+		var list = readStorage();
+		var item = {
+			id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+			name: name.trim(),
+			email: email.trim(),
+			guests: Number(guests),
+			time: new Date().toISOString()
+		};
+		list.unshift(item);
+		writeStorage(list);
+		renderList();
+		showMessage('RSVP added.', 'success');
+	}
+
+	function deleteRsvp(id) {
+		var list = readStorage();
+		var before = list.length;
+		list = list.filter(function (r) {
+			return r.id !== id;
+		});
+		if (list.length === before) return;
+		writeStorage(list);
+		renderList();
+		showMessage('RSVP removed.', 'success');
+	}
+
+	function exportCsv() {
+		var list = readStorage();
+		if (!list.length) {
+			showMessage('No RSVPs to export.', 'error');
+			return;
+		}
+
+		var rows = [['Name', 'Email', 'Guests', 'Time']];
+		list.forEach(function (r) {
+			rows.push([r.name, r.email, String(r.guests), formatTime(r.time)]);
+		});
+
+		var csv = rows.map(function (r) {
+			return r.map(escapeCsv).join(',');
+		}).join('\r\n');
+		var blob = new Blob([csv], {
+			type: 'text/csv;charset=utf-8;'
+		});
+		var url = URL.createObjectURL(blob);
+		var a = document.createElement('a');
+		a.href = url;
+		a.download = 'rsvps.csv';
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		URL.revokeObjectURL(url);
+		showMessage('CSV exported.', 'success');
+	}
+
+	function escapeCsv(field) {
+		if (field == null) return '';
+		var s = String(field).replace(/"/g, '""');
+		return '"' + s + '"';
+	}
+
+	function clearAll() {
+		var ok = confirm('Clear all RSVPs? This cannot be undone.');
+		if (!ok) return;
+		localStorage.removeItem(STORAGE_KEY);
+		renderList();
+		showMessage('All RSVPs cleared.', 'success');
+	}
+
+	// Event listeners
+	form.addEventListener('submit', function (e) {
+		e.preventDefault();
+		var name = nameInput.value || '';
+		var email = emailInput.value || '';
+		var guests = guestsInput.value || '';
+
+		if (!name.trim()) {
+			showMessage('Please enter your name.', 'error');
+			nameInput.focus();
+			return;
+		}
+		if (!validateEmail(email)) {
+			showMessage('Please enter a valid email.', 'error');
+			emailInput.focus();
+			return;
+		}
+		if (!validateGuests(guests)) {
+			showMessage('Guests must be an integer between 1 and 10.', 'error');
+			guestsInput.focus();
+			return;
+		}
+
+		addRsvp({ name: name, email: email, guests: guests });
+		form.reset();
+		nameInput.focus();
+	});
+
+	attendeesBody.addEventListener('click', function (e) {
+		var btn = e.target.closest('button');
+		if (!btn) return;
+		var id = btn.dataset.id;
+		if (!id) return;
+		deleteRsvp(id);
+	});
+
+	exportBtn.addEventListener('click', exportCsv);
+	clearBtn.addEventListener('click', clearAll);
+
+	// Initial render
+	renderList();
+
+})();
+
+</script>
 	</body>
 </html>
