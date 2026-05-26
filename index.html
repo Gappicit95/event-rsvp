@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Event RSVP</title>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container">
+				<h1 id="event-title">Community Meetup</h1>
+				<p class="event-meta" id="event-meta">Saturday, June 12, 2026 · 6:00 PM — Central Hall</p>
+			</div>
+		</header>
+
+		<main class="container" id="main" role="main">
+			<section id="overview" aria-labelledby="overview-heading">
+				<h2 id="overview-heading">Overview</h2>
+				<p>Join us for an evening of networking, talks, and refreshments. Everyone is welcome — bring friends!</p>
+			</section>
+
+			<section id="agenda" aria-labelledby="agenda-heading">
+				<h2 id="agenda-heading">Agenda</h2>
+				<ul>
+					<li><strong>6:00 PM</strong> — Arrival & Refreshments</li>
+					<li><strong>6:30 PM</strong> — Opening Remarks</li>
+					<li><strong>7:00 PM</strong> — Guest Speaker</li>
+					<li><strong>8:00 PM</strong> — Networking</li>
+				</ul>
+			</section>
+
+			<section id="location" aria-labelledby="location-heading">
+				<h2 id="location-heading">Location</h2>
+				<address>
+					Central Hall<br>
+					123 Main Street<br>
+					Anytown, AT 12345
+				</address>
+				<p>
+					<a href="#" id="map-link" aria-label="Open location in Google Maps">View on Google Maps</a>
+				</p>
+			</section>
+
+			<section id="rsvp" aria-labelledby="rsvp-heading">
+				<h2 id="rsvp-heading">RSVP</h2>
+				<form id="rsvp-form" action="#" method="post" aria-describedby="rsvp-instructions">
+					<p id="rsvp-instructions">Fields marked <span aria-hidden="true">*</span> are required.</p>
+
+					<div class="form-row">
+						<label for="name">Full name <span aria-hidden="true">*</span></label>
+						<input id="name" name="name" type="text" required autocomplete="name">
+					</div>
+
+					<div class="form-row">
+						<label for="email">Email <span aria-hidden="true">*</span></label>
+						<input id="email" name="email" type="email" required autocomplete="email">
+					</div>
+
+					<fieldset class="form-row">
+						<legend>Guests</legend>
+						<label for="guests">Number of guests</label>
+						<input id="guests" name="guests" type="number" min="0" max="10" value="0" aria-label="Number of guests">
+					</fieldset>
+
+					<div class="form-actions">
+						<button type="submit" id="submit-rsvp">Add RSVP</button>
+					</div>
+
+					<div id="form-status" role="status" aria-live="polite"></div>
+				</form>
+			</section>
+
+			<section id="attendees" aria-labelledby="attendees-heading">
+				<h2 id="attendees-heading">RSVP List</h2>
+				<div class="list-controls">
+					<button id="export-csv" type="button">Export CSV</button>
+					<button id="clear-all" type="button">Clear All</button>
+				</div>
+
+				<div class="table-wrap" role="region" aria-label="Attendees">
+					<table class="attendees-table" id="attendees-table">
+						<caption class="sr-only">List of RSVP'd attendees</caption>
+						<thead>
+							<tr>
+								<th scope="col">Name</th>
+								<th scope="col">Email</th>
+								<th scope="col">Guests</th>
+								<th scope="col">Time</th>
+							</tr>
+						</thead>
+						<tbody id="attendees-body">
+							<!-- RSVP rows inserted here by app.js -->
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</main>
+
+		<footer class="site-footer">
+			<div class="container">
+				<p>&copy; 2026 Event Organizer</p>
+			</div>
+		</footer>
+
+		<script src="app.js" defer></script>
+	</body>
+</html>
